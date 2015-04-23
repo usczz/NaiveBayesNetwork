@@ -39,3 +39,11 @@ def initDB(inputFile, dbFile):
     conn.commit()
     conn.close()
     fin.close()
+
+def getConnection(dbFile):
+    conn = sqlite3.connect(dbFile)
+    return conn
+
+def getCursor(conn):
+    assert isinstance(conn,sqlite3.Connection)
+    return conn.cursor()
