@@ -19,11 +19,12 @@ def initDB(inputFile, dbFile):
     conn = sqlite3.connect(dbFile)
     tableName = 'risks'
     c = conn.cursor()
-    schema[0] = schema[0] + " INTEGER"
-    for i in range(1, len(schema)):
+    incomeIndex = 0
+    for i in range(0, len(schema)):
+        if schema[i] == 'income':
+            incomeIndex = i
         schema[i] = schema[i] + " TEXT"
     createCommand = 'CREATE TABLE {0} ({1})'.format(tableName, ','.join(schema))
-    print createCommand
     try:
         c.execute(createCommand)
     except sqlite3.OperationalError:
@@ -32,7 +33,16 @@ def initDB(inputFile, dbFile):
     for i in range(1, len(lines)):
         values = lines[i].split("\t")
         values[-1] = values[-1].replace("\r", "").replace("\n", "")
-        for j in range(1, len(values)):
+        values[incomeIndex] = (int)(values[incomeIndex])
+        if values[incomeIndex] <= 25000:
+            values[incomeIndex] = '25000'
+        elif values[incomeIndex] > 25000 and values[incomeIndex] <= 50000:
+            values[incomeIndex] = '25001-50000'
+        elif values[incomeIndex] > 50000 and values[incomeIndex] <= 75000:
+            values[incomeIndex] = '50001-75000'
+        elif values[incomeIndex] > 75000:
+            values[incomeIndex] = '75000'
+        for j in range(0, len(values)):
             values[j] = '\'{0}\''.format(values[j])
         command = getInsertCommand(tableName, attributes, values)
         c.execute(command)
@@ -47,3 +57,8 @@ def getConnection(dbFile):
 def getCursor(conn):
     assert isinstance(conn,sqlite3.Connection)
     return conn.cursor()
+
+def endConnection(conn):
+    conn.commit()
+    conn.close()
+
