@@ -165,7 +165,7 @@ def nextTest(odisLib,opatLib):
 
 def main(argv):
     inputFile = ""
-    outputFile = "bayes_output.txt"
+    outputFile = ""
     try:
         opts,args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
@@ -175,6 +175,22 @@ def main(argv):
         if opt == "-i":
             inputFile = arg
 
+    index = inputFile.rfind('/')
+    dotIndex = inputFile.rfind('.')
+    if index != -1:
+        libPath = inputFile[:index]
+        if dotIndex != -1:
+            fileName = inputFile[index+1:dotIndex]
+            outputFile = libPath + '/' + fileName + '_inference' + inputFile[dotIndex:]
+        else:
+            fileName = inputFile[index+1:]
+            outputFile = libPath + '/' + fileName + '_inference'
+    else:
+        if dotIndex != -1:
+            fileName = inputFile[:dotIndex]
+            outputFile = fileName + '_inference' + inputFile[dotIndex:]
+        else:
+            outputFile = inputFile + '_inference'
     fin = open(inputFile,"r")
     fout = open(outputFile,"w")
     line = fin.readline()
